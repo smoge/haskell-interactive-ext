@@ -1,6 +1,5 @@
 ;;; haskell-interactive-ext.el --- Customized interaction with Haskell REPL -*- lexical-binding: t; -*-
 
-
 ;; Copyright (C) 2023 Bernardo Barros
 ;;
 ;; Version: 0.0.1
@@ -22,10 +21,12 @@
 (defun haskell-eval-line ()
   "Evaluate the current line in the Haskell REPL."
   (interactive)
-  (haskell-interactive-copy-to-prompt)
-  (haskell-interactive-switch)
-  (goto-char (point-max))
-  (end-of-line)
+  (with-current-buffer (current-buffer)
+    (haskell-interactive-copy-to-prompt)
+    (haskell-interactive-switch)
+    (save-excursion
+      (goto-char (point-max))
+      (end-of-line)))
   (haskell-interactive-mode-return)
   (haskell-interactive-switch-back))
 
@@ -37,7 +38,8 @@
 (defcustom haskell-interactive-auto-switch t
   "Automatically switch to the REPL after evaluation."
   :type 'boolean
-  :group 'haskell-interactive)
+  :group 'haskell-interactive
+  :local t)
 
 (provide 'haskell-interactive-ext)
 ;;; haskell-interactive-ext.el ends here
