@@ -18,34 +18,32 @@
 (require 'haskell)
 
 
-;; (defun haskell-eval-line ()
-;;   "Evaluate the current line in the Haskell REPL."
-;;   (interactive)
-;;   (with-current-buffer (current-buffer)
-;;     (haskell-interactive-copy-to-prompt)
-;;     (haskell-interactive-switch)
-;;     (save-excursion
-;;       (goto-char (point-max))
-;;       (end-of-line)))
-;;   (haskell-interactive-mode-return)
-;;   (haskell-interactive-switch-back))
 
-  ;; (pulse-momentary-highlight-one-line (point))
-  ;; (next-line)
 
-defun haskell-eval-line ()
-  "Evaluate the current line in the Haskell REPL."
+(defun haskell-eval-line-or-region ()
+  "Evaluate the current line or region in the Haskell REPL and return to the buffer."
   (interactive)
-  (haskell-interactive-copy-to-prompt)
-  (haskell-interactive-switch)
-  (goto-char (point-max))
-  (end-of-line)
-  (haskell-interactive-mode-return)
-  (haskell-interactive-switch-back))
+  (if (use-region-p)
+      (progn
+        ;; If region is active, copy it.
+        (copy-region-as-kill (region-beginning) (region-end))
+        (haskell-interactive-switch)
+        (yank)
+        (haskell-interactive-mode-return)
+        (other-window 1)) ; switch back to original buffer
+    ;; Else, copy the current line.
+    (haskell-interactive-copy-to-prompt)
+    (haskell-interactive-switch)
+    (goto-char (point-max))
+    (end-of-line)
+    (haskell-interactive-mode-return)
+    (haskell-interactive-switch-back)))
 
 
-;;(defun haskell-eval-line-or-region ()
-;;
+(define-key haskell-mode-map (kbd "S-<return>") 'haskell-eval-line-or-region)
+
+
+
 
 ;; Configuration options
 (defcustom haskell-interactive-auto-switch t
